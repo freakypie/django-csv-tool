@@ -26,9 +26,13 @@ class CsvImportTool(object):
             if idx == 0:
                 headers = []
                 for header in row:
-                    headers.append(self.aliases.get(header, header).replace(" ", "_"))
+                    header = header.strip().replace(" ", "_")
+                    headers.append(self.aliases.get(header, header))
             else:
+                for idx, value in enumerate(row):
+                    row[idx] = value.strip()
                 values = dict(zip(headers, row))
+
                 instance = self.get_or_create(values)
 
                 # before save
@@ -42,7 +46,7 @@ class CsvImportTool(object):
                         func(instance, values, header)
 
                 self.save_model(instance, values)
-
+                
                 for header in headers:
                     func = getattr(self, "import_%s_after" % header, None)
 
