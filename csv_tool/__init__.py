@@ -98,6 +98,13 @@ class CsvExportTool(object):
                 row.append(attr)
             rows.append(row)
 
+
+        # clean out unicode:
+        from django.utils.encoding import smart_str
+        for i, row in enumerate(rows):
+            for j, cell in enumerate(row):
+                row[j] = smart_str(cell)
+            rows[i] = row
         return rows
 
     def export_file(self, queryset, fileh):
