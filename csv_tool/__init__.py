@@ -46,7 +46,7 @@ class CsvImportTool(object):
                         func(instance, values, header)
 
                 self.save_model(instance, values)
-                
+
                 for header in headers:
                     func = getattr(self, "import_%s_after" % header, None)
 
@@ -59,3 +59,45 @@ class CsvImportTool(object):
     def _import_property(self, instance, values, name):
         setattr(instance, name, values[name])
 
+
+class CsvExportTool(object):
+    fields = ["id", "__unicode__"]
+
+    def export(self, queryset):
+        self.errors = []
+
+        rows = []
+
+        # add headers
+        headers = []
+        for field in self.fields:
+            if "." in field:
+                headers.append(field.rsplit(".", 1)[-1])
+            else:
+                headers.append(field)
+        rows.append(headers)
+
+        # add records
+        for instance in queryset:
+            row = []
+            self.cache = {}
+            for field in self.fields:
+                attr = getattr(self, "export_%s" % field, None)
+                if not attr:
+                    attr = instance
+                    for bit in field.split("."):
+                        attr = getattr(attr, bit, None)
+                        if not attr:
+                            break
+
+                if callable(attr):
+                    attr = attr()
+
+                row.append(attr)
+            rows.append(row)
+
+        return rows
+
+    def export_file(self, queryset, file):
+        writer = csv.writer(fileh)
+        writer.writerows(self.export(queryset))
