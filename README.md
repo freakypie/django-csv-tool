@@ -21,7 +21,7 @@ The csv tool will map headers to import functions:
         def import_username(self, instance, values, name):
             value = values.get(name, "")
 
-            ... check that the username ...
+            ... check the username ...
 
             instance.username = value
 
