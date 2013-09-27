@@ -83,7 +83,9 @@ class CsvExportTool(object):
             self.cache = {}
             for field in self.fields:
                 attr = getattr(self, "export_%s" % field, None)
-                if not attr:
+                if attr:
+                    attr = attr(instance)
+                else:
                     attr = instance
                     for bit in field.split("."):
                         attr = getattr(attr, bit, None)
@@ -98,6 +100,6 @@ class CsvExportTool(object):
 
         return rows
 
-    def export_file(self, queryset, file):
+    def export_file(self, queryset, fileh):
         writer = csv.writer(fileh)
         writer.writerows(self.export(queryset))
