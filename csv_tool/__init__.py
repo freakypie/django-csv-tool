@@ -2,10 +2,17 @@ from django.utils.datastructures import SortedDict
 import csv
 
 
+class CsvSkipException(Exception):
+    pass
+
+
 class CsvImportTool(object):
     model = None
     fields = []
     aliases = {}
+
+    errors = []
+    count = 0
 
     def register_aliases(self, name, aliases):
         for alias in aliases:
@@ -21,6 +28,7 @@ class CsvImportTool(object):
         pass
 
     def import_from_file(self, file_object):
+        self.count = 0
         self.errors = []
         for idx, row in enumerate(csv.reader(file_object)):
             if idx == 0:
@@ -33,27 +41,34 @@ class CsvImportTool(object):
                     row[idx] = value.strip()
                 values = dict(zip(headers, row))
 
-                instance = self.get_or_create(values)
+                try:
+                    instance = self.get_or_create(values)
 
-                # before save
-                for header in headers:
-                    if header in self.fields:
-                        func = self._import_property
-                    else:
-                        func = getattr(self, "import_%s" % header, None)
+                    # before save
+                    for header in headers:
+                        if header in self.fields:
+                            func = self._import_property
+                        else:
+                            func = getattr(self, "import_%s" % header, None)
 
-                    if func:
-                        func(instance, values, header)
+                        if func:
+                            func(instance, values, header)
 
-                self.save_model(instance, values)
+                    self.save_model(instance, values)
 
-                for header in headers:
-                    func = getattr(self, "import_%s_after" % header, None)
+                    for header in headers:
+                        func = getattr(self, "import_%s_after" % header, None)
 
-                    if func:
-                        func(instance, values, header)
+                        if func:
+                            func(instance, values, header)
 
-                self.finished(instance, values)
+                    self.finished(instance, values)
+                    self.count_row(instance, values)
+                except CsvSkipException:
+                    pass
+
+    def count_row(self, instance, values):
+        self.count += 1
 
     # import functions
     def _import_property(self, instance, values, name):
@@ -97,7 +112,6 @@ class CsvExportTool(object):
 
                 row.append(attr)
             rows.append(row)
-
 
         # clean out unicode:
         from django.utils.encoding import smart_str
