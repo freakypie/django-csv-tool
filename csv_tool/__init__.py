@@ -33,16 +33,20 @@ class CsvImportTool(object):
     def import_from_file(self, file_object):
         self.count = 0
         self.errors = []
+        headers = []
         for idx, row in enumerate(csv.reader(file_object)):
             if idx == 0:
-                headers = []
                 for header in row:
-                    header = header.strip().replace(" ", "_")
+                    header = header.lower().strip().replace(" ", "_")
                     headers.append(self.aliases.get(header, header))
             else:
                 for idx, value in enumerate(row):
                     row[idx] = value.strip()
                 values = dict(zip(headers, row))
+
+                # empty row
+                if not values:
+                    continue
 
                 try:
                     instance = self.get_or_create(values)
@@ -75,7 +79,7 @@ class CsvImportTool(object):
 
     # import functions
     def _import_property(self, instance, values, name):
-        setattr(instance, name, values[name])
+        setattr(instance, name, values.get(name))
 
 
 class UnicodeWriter(object):
