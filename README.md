@@ -45,5 +45,31 @@ There are some other functions you can override to customize the behavior of you
     def finalize(self, instance, values)
 
 
+Also included is a csv Export tool
+
+    from csv_tool import CsvExportTool
+    
+    class MyExport(CsvExportTool):
+        fields = ["custom", "id"]  # list fields here
+
+        def export_custom(self, obj, fieldname):
+            # custom logic
+            return obj.custom
+
+Unlike the Import, you need to explicitly list fields you want to export
+even if they have a custom export function.
+
+If you want to reuse a export method or use it multple times or with an 
+alternate label/header use a tuple in the fields attribute of the class:
+
+    from csv_tool import CsvExportTool
+    
+    class MyExport(CsvExportTool):
+        fields = ["custom", ("id", "custom")] # export id the same as `custom`
+
+        def export_custom(self, obj, fieldname): # fieldname will be "id"
+            # custom logic
+            return obj.custom
+
 
 
