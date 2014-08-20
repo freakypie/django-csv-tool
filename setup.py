@@ -9,6 +9,5 @@ setup(
     url='https://bitbucket.org/freakypie/django-csv-tool',
     description='Tool to help create CSV imports faster',
     install_requires=[
-        "Django>=1.2,<1.5",
     ]
 )
