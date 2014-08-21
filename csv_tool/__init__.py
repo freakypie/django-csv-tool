@@ -30,7 +30,7 @@ class CsvImportTool(object):
     def finished(self, instance, values):
         pass
 
-    def import_from_file(self, file_object):
+    def import_from_file(self, file_object, starting_line=1, ending_line=None):
         self.count = 0
         self.errors = []
         headers = []
@@ -39,7 +39,9 @@ class CsvImportTool(object):
                 for header in row:
                     header = header.lower().strip().replace(" ", "_")
                     headers.append(self.aliases.get(header, header))
-            else:
+            elif ending_line and idx > ending_line:
+                break
+            elif idx >= starting_line:
                 for idx, value in enumerate(row):
                     row[idx] = value.strip()
                 values = dict(zip(headers, row))
