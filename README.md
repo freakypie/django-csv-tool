@@ -5,6 +5,7 @@ The csv tool will map headers to import functions:
     import csv_tool
 
     class UserImport(csv_tool.CsvImportTool):
+        model = User
 
         # specify the fields you want to import without modification here
         fields = ["first_name", "last_name"]
@@ -50,6 +51,7 @@ Also included is a csv Export tool
     from csv_tool import CsvExportTool
     
     class MyExport(CsvExportTool):
+        model = MyUser
         fields = ["custom", "id"]  # list fields here
 
         def export_custom(self, obj, fieldname):
@@ -70,6 +72,3 @@ alternate label/header use a tuple in the fields attribute of the class:
         def export_custom(self, obj, fieldname): # fieldname will be "id"
             # custom logic
             return obj.custom
-
-
-
