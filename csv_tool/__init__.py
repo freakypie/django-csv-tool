@@ -1,6 +1,6 @@
 from django.utils.datastructures import SortedDict
 import csv
-import cStringIO
+from six.moves import cStringIO
 import codecs
 from django.utils.encoding import force_unicode
 
