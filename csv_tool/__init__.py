@@ -2,7 +2,7 @@ from django.utils.datastructures import SortedDict
 import csv
 from six.moves import cStringIO
 import codecs
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 
 class CsvSkipException(Exception):
@@ -98,7 +98,7 @@ class UnicodeWriter(object):
         self.encoder = codecs.getincrementalencoder(encoding)()
 
     def writerow(self, row):
-        self.writer.writerow([force_unicode(s).encode("utf-8") for s in row])
+        self.writer.writerow([force_text(s).encode("utf-8") for s in row])
         # Fetch UTF-8 output from the queue ...
         data = self.queue.getvalue()
         data = data.decode("utf-8")
