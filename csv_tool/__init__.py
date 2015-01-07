@@ -92,7 +92,7 @@ class UnicodeWriter(object):
 
     def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
         # Redirect output to a queue
-        self.queue = cStringIO.StringIO()
+        self.queue = cStringIO()
         self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
         self.stream = f
         self.encoder = codecs.getincrementalencoder(encoding)()
@@ -201,8 +201,12 @@ class CsvExportTool(object):
     def _export_dotted(self, instance, fieldname):
         attr = instance
         for bit in fieldname.split("."):
-            attr = getattr(attr, bit, None)
-            if not attr:
+            try:
+                attr = getattr(attr, bit, None)
+                if not attr:
+                    break
+            except:
+                attr = None
                 break
 
         if callable(attr):
