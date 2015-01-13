@@ -1,7 +1,9 @@
-from django.utils.datastructures import SortedDict
 import csv
+
 from six.moves import cStringIO
 import codecs
+from django.core.files.base import File
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils.encoding import force_text
 
 
@@ -34,6 +36,13 @@ class CsvImportTool(object):
         self.count = 0
         self.errors = []
         headers = []
+
+        # attempt to open in universal line ending mode
+        if isinstance(file_object, InMemoryUploadedFile):
+            file_object = file_object.read().splitlines()
+        elif isinstance(file_object, File):
+            file_object.open("rU")
+
         for idx, row in enumerate(csv.reader(file_object)):
             if idx == 0:
                 for header in row:
