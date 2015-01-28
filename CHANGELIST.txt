@@ -1,0 +1,1 @@
+v 0.3.6: Added a count of rows that will be added, in case you want to know what progress has been made

@@ -32,6 +32,11 @@ class CsvImportTool(object):
     def finished(self, instance, values):
         pass
 
+    def count_lines(self, f):
+        for i, l in enumerate(f):
+            pass
+        return i + 1
+
     def import_from_file(self, file_object, starting_line=1, ending_line=None):
         self.count = 0
         self.errors = []
@@ -40,8 +45,14 @@ class CsvImportTool(object):
         # attempt to open in universal line ending mode
         if isinstance(file_object, InMemoryUploadedFile):
             file_object = file_object.read().splitlines()
+            self.total = len(file_object)
         elif isinstance(file_object, File):
             file_object.open("rU")
+            self.total = self.count_lines(file_object)
+            file_object.seek(0)
+        else:
+            self.total = self.count_lines(file_object)
+            file_object.seek(0)
 
         for idx, row in enumerate(csv.reader(file_object)):
             if idx == 0:

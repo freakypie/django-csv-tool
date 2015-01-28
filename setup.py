@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-csv-tool',
-    version='0.3.5',
+    version='0.3.6',
     author='John Leith',
     author_email='leith.john@gmail.com',
     packages=find_packages(),
