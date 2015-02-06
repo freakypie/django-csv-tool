@@ -95,6 +95,8 @@ class CsvImportTool(object):
                     self.count_row(instance, values)
                 except CsvSkipException:
                     pass
+                except Exception as ex:
+                    self.errors.append(str(ex))
 
     def count_row(self, instance, values):
         self.count += 1
@@ -197,6 +199,9 @@ class CsvExportTool(object):
             row.append(attr)
         return row
 
+    def exported(self, instance):
+        pass
+
     def export(self, queryset):
         self.errors = []
 
@@ -207,8 +212,12 @@ class CsvExportTool(object):
         rows.append(self.labels(headers))
 
         # add records
+        self.count = 0
+        self.total = len(queryset)
         for instance in queryset:
             rows.append(self.instance_to_row(instance))
+            self.count += 1
+            self.exported(instance)
 
 #         # clean out unicode:
 #         from django.utils.encoding import smart_str
